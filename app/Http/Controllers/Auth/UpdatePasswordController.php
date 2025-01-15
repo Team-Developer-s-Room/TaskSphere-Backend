@@ -16,7 +16,7 @@ class UpdatePasswordController   extends Controller
         // Check if the current password is correct
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
-                'message' => 'Current password is incorrect.',
+                'error' => 'Current password is incorrect.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         
