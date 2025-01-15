@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\UpdatePasswordController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,7 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/register', [RegisterController::class, 'register'])->name('register');
         Route::post('/login', [LoginController::class, 'login'])->name('login');
+        Route::post('/login', [UpdatePasswordController::class, 'updatePassword'])->name('update_password');
     });
 
     Route::middleware('auth:sanctum')->group(function () {
