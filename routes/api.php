@@ -20,7 +20,8 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/register', [RegisterController::class, 'register'])->name('register');
         Route::post('/login', [LoginController::class, 'login'])->name('login');
-        Route::post('/login', [UpdatePasswordController::class, 'updatePassword'])->name('update_password');
+        Route::post('/update-password', [UpdatePasswordController::class, 'updatePassword'])
+        ->name('update-password')->middleware('auth:sanctum');
     });
 
     Route::middleware('auth:sanctum')->group(function () {
