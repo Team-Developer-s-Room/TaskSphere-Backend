@@ -27,6 +27,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('users', UserController::class)->only('update');
+        Route::apiResource('projects', UserController::class);
     });
 
     
