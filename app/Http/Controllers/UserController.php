@@ -14,7 +14,12 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::all();
+
+        return response()->json([
+            'data' => UserResource::collection($users),
+            'message' => 'Users retrieved successfully',
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -22,7 +27,10 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return response()->json([
+            'data' => new UserResource($user),
+            'message' => 'User retrieved successfully',
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -45,6 +53,9 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        // TODO
+        // Soft delete the user
+        // Do something regarding the projects he created
+        // Do something regarding the projects he is collaborating in
     }
 }
