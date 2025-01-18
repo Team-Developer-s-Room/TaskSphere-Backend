@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
@@ -35,4 +36,28 @@ class Project extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
+
+    /**
+     * Get the admin associated with the project.
+     */
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
+
+    /**
+     * Get the collaborators associated with the project.
+     */
+    public function collaborators(): HasMany
+    {
+        return $this->hasMany(Collaborator::class);
+    }
+
+    /**
+     * Get the users (collaborators) associated with the project through the collaborators table.
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'collaborators');
+    }
 }

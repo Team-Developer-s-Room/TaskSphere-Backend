@@ -46,4 +46,47 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the projects admined by a user.
+     */
+    public function adminProjects()
+    {
+        return $this->hasMany(Project::class, 'admin_id');
+    }
+
+    /**
+     * Get the collaborations a user has.
+     */
+    public function collaborations()
+    {
+        return $this->hasMany(Collaborator::class);
+    }
+
+    /**
+     * Get the projects a user has collaborated with through collaborators table.
+     */
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'collaborators');
+    }
+
+    /**
+     * Get the collaborators of a project admined by a user.
+     */
+    public function projectCollaborators()
+    {
+        return $this->hasManyThrough(Collaborator::class, Project::class, 'admin_id', 'project_id', 'id', 'id');
+    }
+    
+    /**
+     * Get all projects the user is involded in either as an admin or collaborator
+     */
+    public function allProjects()
+    {
+        $adminProjects = $this->adminProjects()->select('projects.*');
+        $collaboratorProjects = $this->projects()->select('projects.*');
+
+        return $adminProjects->union($collaboratorProjects)->orderBy('created_at', 'desc');
+    }
 }
