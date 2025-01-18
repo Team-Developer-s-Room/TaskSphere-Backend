@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Auth\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,7 +16,7 @@ class ProjectResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'admin_id' => $this->admin_id,
+            'admin' => new UserResource($this->admin),
             'name' => $this->name,
             'image' => $this->image,
             'description' => $this->description,

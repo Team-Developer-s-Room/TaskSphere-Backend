@@ -15,8 +15,12 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $upcoming_projects = Project::where('status', 'upcoming')->get();
-        // $p
+        $projects = Project::with(['admin'])->get();
+
+        return response()->json([
+            'data' => ProjectResource::collection($projects),
+            'message' => 'Projects retrieved successfully',
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -46,7 +50,9 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         // TODO
-        // Eager load collaborators and tasks associated to the project
+        // Eager load associated admin
+        // Eager load collaborators
+        // Eager load associated tasks
         // $project->load();
 
         return response()->json([
@@ -60,7 +66,8 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        // TODO
+        // Task details can also be updated
     }
 
     /**
@@ -68,6 +75,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        // TODO
+        // Remove associated tasks
     }
 }

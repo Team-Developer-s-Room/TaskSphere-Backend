@@ -44,7 +44,7 @@ class UserController extends Controller
 
         return response()->json([
             'data' => new UserResource($user),
-            'message' => 'Data updated successfully',
+            'message' => 'User updated successfully',
         ], Response::HTTP_OK);
     }
 
