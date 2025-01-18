@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Collaborator;
 use App\Http\Requests\StoreCollaboratorRequest;
 use App\Http\Requests\UpdateCollaboratorRequest;
+use App\Http\Resources\CollaboratorResource;
+use Illuminate\Http\Response;
 
 class CollaboratorController extends Controller
 {
@@ -13,7 +15,12 @@ class CollaboratorController extends Controller
      */
     public function index()
     {
-        //
+        $collaborators = Collaborator::with(['user', 'project'])->get();
+
+        return response()->json([
+            'data' => CollaboratorResource::collection($collaborators),
+            'message' => 'Collaborators retrieved successfully',
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -21,7 +28,15 @@ class CollaboratorController extends Controller
      */
     public function store(StoreCollaboratorRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $collaborator = Collaborator::create($validated);
+        $collaborator->load(['user', 'project']);
+
+        return response()->json([
+            'data' => new CollaboratorResource($collaborator),
+            'message' => 'Collaborator added successfully',
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -29,7 +44,12 @@ class CollaboratorController extends Controller
      */
     public function show(Collaborator $collaborator)
     {
-        //
+        $collaborator->load(['user', 'project']);
+
+        return response()->json([
+            'data' => new CollaboratorResource($collaborator),
+            'message' => 'Collaborator retrieved successfully',
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -37,7 +57,15 @@ class CollaboratorController extends Controller
      */
     public function update(UpdateCollaboratorRequest $request, Collaborator $collaborator)
     {
-        //
+        $validated = $request->validated();
+
+        $collaborator->update($validated);
+        $collaborator->load(['user', 'project']);
+
+        return response()->json([
+            'data' => new CollaboratorResource($collaborator),
+            'message' => 'Collaborator retrieved successfully',
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -45,6 +73,10 @@ class CollaboratorController extends Controller
      */
     public function destroy(Collaborator $collaborator)
     {
-        //
+        $collaborator->delete();
+
+        return response()->json([
+            'message' => 'Collaborator deleted successfully',
+        ], Response::HTTP_NO_CONTENT);
     }
 }

@@ -66,8 +66,14 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        // TODO
-        // Task details can also be updated
+        $validated = $request->validated();
+
+        $project->update($validated);
+
+        return response()->json([
+            'data' => new ProjectResource($project),
+            'message' => 'Project updated successfully',
+        ], Response::HTTP_OK);
     }
 
     /**
