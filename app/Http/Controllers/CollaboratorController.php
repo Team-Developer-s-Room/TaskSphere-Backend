@@ -2,23 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RemoveCollaboratorRequest;
 use App\Models\Collaborator;
 use App\Http\Requests\StoreCollaboratorRequest;
 use App\Http\Requests\UpdateCollaboratorRequest;
-use App\Http\Resources\CollaboratorResource;
+use App\Http\Resources\Auth\UserResource;
+use App\Models\Project;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class CollaboratorController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Project $project)
     {
-        $collaborators = Collaborator::with(['user', 'project'])->get();
+        $users = $project->users;
 
         return response()->json([
-            'data' => CollaboratorResource::collection($collaborators),
+            'data' => UserResource::collection($users),
             'message' => 'Collaborators retrieved successfully',
         ], Response::HTTP_OK);
     }
@@ -26,54 +29,63 @@ class CollaboratorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCollaboratorRequest $request)
+    public function store(StoreCollaboratorRequest $request, Project $project)
     {
+        Gate::authorize('create', $project);
+        
         $validated = $request->validated();
+        $validated['project_id'] = $project->id;
 
         $collaborator = Collaborator::create($validated);
-        $collaborator->load(['user', 'project']);
+        $user = $collaborator->user;
 
         return response()->json([
-            'data' => new CollaboratorResource($collaborator),
+            'data' => new UserResource($user),
             'message' => 'Collaborator added successfully',
         ], Response::HTTP_CREATED);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Collaborator $collaborator)
-    {
-        $collaborator->load(['user', 'project']);
+    // /**
+    //  * Display the specified resource.
+    //  */
+    // public function show(Collaborator $collaborator)
+    // {
+    //     $user = $collaborator->user;
 
-        return response()->json([
-            'data' => new CollaboratorResource($collaborator),
-            'message' => 'Collaborator retrieved successfully',
-        ], Response::HTTP_OK);
-    }
+    //     return response()->json([
+    //         'data' => new UserResource($user),
+    //         'message' => 'Collaborator retrieved successfully',
+    //     ], Response::HTTP_OK);
+    // }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateCollaboratorRequest $request, Collaborator $collaborator)
-    {
-        $validated = $request->validated();
+    // /**
+    //  * Update the specified resource in storage.
+    //  */
+    // public function update(UpdateCollaboratorRequest $request, Collaborator $collaborator)
+    // {
+    //     $validated = $request->validated();
 
-        $collaborator->update($validated);
-        $collaborator->load(['user', 'project']);
+    //     $collaborator->update($validated);
+    //     $user = $collaborator->user;
 
-        return response()->json([
-            'data' => new CollaboratorResource($collaborator),
-            'message' => 'Collaborator retrieved successfully',
-        ], Response::HTTP_OK);
-    }
+    //     return response()->json([
+    //         'data' => new UserResource($user),
+    //         'message' => 'Collaborator retrieved successfully',
+    //     ], Response::HTTP_OK);
+    // }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Collaborator $collaborator)
+    public function destroy(RemoveCollaboratorRequest $request, Project $project)
     {
-        $collaborator->delete();
+        Gate::authorize('delete', $project);
+        
+        $validated = $request->validated();
+
+        Collaborator::where('project_id', $project->id)
+        ->where('user_id', $validated['user_id'])
+        ->delete();
 
         return response()->json([
             'message' => 'Collaborator deleted successfully',

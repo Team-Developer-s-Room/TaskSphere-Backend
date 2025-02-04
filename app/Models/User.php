@@ -22,6 +22,8 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'phone',
+        'image',
     ];
 
     /**
@@ -89,4 +91,14 @@ class User extends Authenticatable
 
         return $adminProjects->union($collaboratorProjects)->orderBy('created_at', 'desc');
     }
+
+    /**
+     * Get the tasks associated with the user.
+     */
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_users', 'user_id', 'task_id');
+    }
+
 }
+    

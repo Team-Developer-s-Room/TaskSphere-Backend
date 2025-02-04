@@ -42,7 +42,7 @@ class Project extends Model
      */
     public function admin()
     {
-        return $this->belongsTo(User::class, 'admin_id');
+        return $this->belongsTo(User::class, 'admin_id')->withDefault();
     }
 
     /**
@@ -60,4 +60,13 @@ class Project extends Model
     {
         return $this->belongsToMany(User::class, 'collaborators');
     }
+
+    /**
+     * Get the tasks associated with the project.
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
 }

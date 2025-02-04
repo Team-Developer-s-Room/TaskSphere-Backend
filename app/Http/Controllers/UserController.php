@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\Auth\UserResource;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -38,7 +40,18 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
+        Gate::authorize('update');
+
         $validated = $request->validated();
+
+        if($request->hasFile('image')) {
+            if($user->image && Storage::disk('public')->exists($user->image)) {
+                Storage::disk('public')->delete($user->image);
+            }
+
+            $imagePath = $request->file('image')->store('profile-images', 'public');
+            $validated['image'] = $imagePath;
+        }
 
         $user->update($validated);
 
@@ -53,6 +66,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        Gate::authorize('delete');
         // TODO
         // Soft delete the user
         // Do something regarding the projects he created

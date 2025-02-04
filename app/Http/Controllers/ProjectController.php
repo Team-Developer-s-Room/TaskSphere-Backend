@@ -6,7 +6,9 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\SuperProjectResource;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class ProjectController extends Controller
 {
@@ -49,11 +51,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        // TODO
-        // Eager load associated admin
-        // Eager load collaborators
-        // Eager load associated tasks
-        // $project->load();
+        $project->load(['collaborators', 'admin', 'users:image']);
+        Gate::authorize('view', $project);
 
         return response()->json([
             'data' => new ProjectResource($project),
@@ -62,10 +61,27 @@ class ProjectController extends Controller
     }
 
     /**
+     * Display the specified resource in more detail.
+     */
+    public function showDetailed(Project $project)
+    {
+        $project->load(['collaborators', 'admin', 'users', 'tasks']);
+        Gate::authorize('view', $project);
+
+        return response()->json([
+            'data' => new SuperProjectResource($project),
+            'message' => 'Project retrieved successfully',
+        ], Response::HTTP_OK);
+    }
+
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
+        Gate::authorize('update', $project);
+        
         $validated = $request->validated();
 
         $project->update($validated);
@@ -81,7 +97,19 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        // TODO
-        // Remove associated tasks
+        Gate::authorize('delete', $project);
+
+        // Delete associated tasks
+        $project->tasks()->delete();
+        // Delete associated collaborators
+        $project->collaborators()->delete();
+        // Detach users if using many-to-many relationship
+        $project->users()->detach();
+        // Finally, delete the project
+        $project->delete();
+
+        return response()->json([
+            'message' => 'Project deleted successfully',
+        ], Response::HTTP_OK);
     }
 }

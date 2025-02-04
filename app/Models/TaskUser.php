@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Collaborator extends Model
+class TaskUser extends Model
 {
-    /** @use HasFactory<\Database\Factories\CollaboratorFactory> */
+    /** @use HasFactory<\Database\Factories\TaskUserFactory> */
     use HasFactory;
+
+    protected $table = 'task_users';
 
     /**
      * The attributes that are mass assignable.
@@ -17,20 +18,20 @@ class Collaborator extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'task_id',
         'user_id',
-        'project_id',
     ];
 
     /**
-     * Get the project associated with the collaborator.
+     * Get the task associated with the task_users.
      */
-    public function project(): BelongsTo
+    public function task()
     {
-        return $this->belongsTo(Project::class)->withDefault();
+        return $this->belongsTo(Task::class)->withDefault();
     }
-
+    
     /**
-     * Get the user who is the collaborator
+     * Get the user associated with the task_users.
      */
     public function user()
     {
