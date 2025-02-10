@@ -8,6 +8,7 @@ use App\Http\Requests\StoreCollaboratorRequest;
 use App\Http\Requests\UpdateCollaboratorRequest;
 use App\Http\Resources\Auth\UserResource;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
@@ -77,18 +78,17 @@ class CollaboratorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RemoveCollaboratorRequest $request, Project $project)
+    public function destroy(Project $project, User $user)
     {
         Gate::authorize('delete', $project);
-        
-        $validated = $request->validated();
 
         Collaborator::where('project_id', $project->id)
-        ->where('user_id', $validated['user_id'])
+        ->where('user_id', $user->id)
         ->delete();
 
         return response()->json([
             'message' => 'Collaborator deleted successfully',
-        ], Response::HTTP_NO_CONTENT);
+        ], Response::HTTP_OK);
     }
+
 }

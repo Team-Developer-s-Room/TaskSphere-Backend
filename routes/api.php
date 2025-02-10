@@ -5,6 +5,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\UpdatePasswordController;
+use App\Http\Controllers\CollaboratorController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,8 +29,18 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
 
-        Route::apiResource('users', UserController::class)->only('update');
-        Route::apiResource('projects', UserController::class);
+        Route::apiResource('users', UserController::class)->except(['destroy', 'store']);
+        
+        Route::apiResource('projects', ProjectController::class);
+        Route::get('projects-detailed/{project}', [ProjectController::class, 'showDetailed']);
+
+        Route::apiResource('tasks', TaskController::class)->except('index');
+        Route::get('project/{project}/tasks', [TaskController::class, 'index']);
+        
+        Route::get('project/{project}/collaborators', [CollaboratorController::class, 'index']);
+        Route::post('project/{project}/collaborators', [CollaboratorController::class, 'store']);
+        Route::delete('project/{project}/collaborators/{coll}', [CollaboratorController::class, 'destroy']);
+        
     });
 
     
