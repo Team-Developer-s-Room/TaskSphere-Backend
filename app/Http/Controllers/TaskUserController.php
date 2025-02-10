@@ -8,6 +8,7 @@ use App\Http\Requests\StoreTaskUserRequest;
 use App\Http\Requests\UpdateTaskUserRequest;
 use App\Http\Resources\Auth\UserResource;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
@@ -78,15 +79,13 @@ class TaskUserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RemoveTaskUserRequest $request, Task $task)
+    public function destroy(Task $task, User $user)
     {
         $task->load('project');
         Gate::authorize('delete', $task);
-        
-        $validated = $request->validated();
 
         TaskUser::where('task_id', $task->id)
-        ->where('user_id', $validated['user_id'])
+        ->where('user_id', $user->id)
         ->delete();
 
         return response()->json([
