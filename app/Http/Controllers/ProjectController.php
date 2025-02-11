@@ -17,7 +17,14 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with(['admin'])->get();
+        $userId = auth()->id();
+
+        $projects = Project::with(['admin', 'collaborators'])
+            ->where('admin_id', $userId) // Projects where user is an admin
+            ->orWhereHas('collaborators', function ($query) use ($userId) {
+                $query->where('user_id', $userId); // Projects where user is a collaborator
+            })
+            ->get();
 
         return response()->json([
             'data' => ProjectResource::collection($projects),
@@ -51,20 +58,6 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->load(['collaborators', 'admin', 'users:image']);
-        Gate::authorize('view', $project);
-
-        return response()->json([
-            'data' => new ProjectResource($project),
-            'message' => 'Project retrieved successfully',
-        ], Response::HTTP_OK);
-    }
-
-    /**
-     * Display the specified resource in more detail.
-     */
-    public function showDetailed(Project $project)
-    {
         $project->load(['collaborators', 'admin', 'users', 'tasks']);
         Gate::authorize('view', $project);
 
@@ -74,14 +67,13 @@ class ProjectController extends Controller
         ], Response::HTTP_OK);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
         Gate::authorize('update', $project);
-        
+
         $validated = $request->validated();
 
         $project->update($validated);

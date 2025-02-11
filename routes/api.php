@@ -33,10 +33,9 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('users', UserController::class)->except(['destroy', 'store']);
         
         Route::apiResource('projects', ProjectController::class);
-        Route::get('projects-detailed/{project}', [ProjectController::class, 'showDetailed']);
 
-        Route::apiResource('tasks', TaskController::class)->except('index');
         Route::get('project/{project}/tasks', [TaskController::class, 'index']);
+        Route::apiResource('tasks', TaskController::class)->except('index');
         
         Route::get('projects/{project}/collaborators', [CollaboratorController::class, 'index']);
         Route::post('projects/{project}/collaborators', [CollaboratorController::class, 'store']);
@@ -45,7 +44,6 @@ Route::prefix('v1')->group(function () {
         Route::get('tasks/{task}/task-users', [TaskUserController::class, 'index']);
         Route::post('tasks/{task}/task-users', [TaskUserController::class, 'store']);
         Route::delete('tasks/{task}/task-users/{user}', [TaskUserController::class, 'destroy']);
-        
     });
 
     
