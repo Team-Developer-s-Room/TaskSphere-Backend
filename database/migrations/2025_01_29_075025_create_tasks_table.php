@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
+            $table->ulid('nano_id')->unique();
             $table->foreignId('project_id')->constrained();
             $table->mediumText('description')->nullable();
             $table->string('status')->nullable();

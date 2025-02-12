@@ -16,6 +16,7 @@ class CollaboratorResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->nano_id,
             'user' => new UserResource($this->user),
             'project_id' => $this->project_id,
             'created_at' => $this->created_at,

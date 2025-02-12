@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('task_users', function (Blueprint $table) {
             $table->id();
+            $table->ulid('nano_id')->unique();
             $table->foreignId('task_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->timestamps();

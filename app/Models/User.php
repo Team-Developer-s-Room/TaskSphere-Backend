@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasUlids;
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +27,26 @@ class User extends Authenticatable
         'phone',
         'image',
     ];
+
+    /**
+     * Get the route key for the model
+     *
+     * @return string
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'nano_id';
+    }
+
+    /**
+     * Get the value of the model's route key
+     *
+     * @return mixed
+     */
+    public function getRouteKey(): mixed
+    {
+        return $this->nano_id;
+    }
 
     /**
      * The attributes that should be hidden for serialization.

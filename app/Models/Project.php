@@ -38,6 +38,26 @@ class Project extends Model
     ];
 
     /**
+     * Get the route key for the model
+     *
+     * @return string
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'nano_id';
+    }
+
+    /**
+     * Get the value of the model's route key
+     *
+     * @return mixed
+     */
+    public function getRouteKey(): mixed
+    {
+        return $this->nano_id;
+    }
+
+    /**
      * Get the admin associated with the project.
      */
     public function admin()
@@ -68,5 +88,4 @@ class Project extends Model
     {
         return $this->hasMany(Task::class);
     }
-
 }

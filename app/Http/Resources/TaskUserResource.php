@@ -15,7 +15,7 @@ class TaskUserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->nano_id,
             'task_id' => $this->task_id,
             'user_id' => $this->user_id,
             'created_at' => $this->created_at,

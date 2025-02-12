@@ -16,6 +16,7 @@ class ProjectResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->nano_id,
             'admin' => new UserResource($this->admin),
             'name' => $this->name,
             'image' => $this->image,
