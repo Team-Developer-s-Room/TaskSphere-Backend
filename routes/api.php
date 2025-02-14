@@ -16,15 +16,15 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
 
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+    Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset');
 
     Route::name('auth.')->group(function () {
 
         Route::post('/register', [RegisterController::class, 'register'])->name('register');
         Route::post('/login', [LoginController::class, 'login'])->name('login');
-        Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
+        Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum')->name('logout');
         Route::post('/update-password', [UpdatePasswordController::class, 'updatePassword'])
-        ->name('update-password')->middleware('auth:sanctum');
+        ->name('update.password')->middleware('auth:sanctum');
     });
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -45,5 +45,4 @@ Route::prefix('v1')->group(function () {
         Route::delete('tasks/{task}/task-users/{user}', [TaskUserController::class, 'destroy']);
     });
 
-    
 });

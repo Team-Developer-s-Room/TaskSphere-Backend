@@ -6,20 +6,15 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
 
-class TaskSubmitted extends Notification
+class TestNotification extends Notification
 {
     use Queueable;
-
-    protected $subject = 'Task Submitted';
-    protected $message = 'Your task has been submitted and the admin has been notified.';
-    protected $url = '';
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(protected $task)
+    public function __construct()
     {
         //
     }
@@ -40,11 +35,9 @@ class TaskSubmitted extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-        ->subject($this->subject)
-            ->greeting('Hello ' . Auth::user()->username . '!')
-            ->line($this->message)
-            ->action('View Task', $this->url)
-            ->line("Thank you for using " . env('APP_NAME') . "!");
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -55,9 +48,7 @@ class TaskSubmitted extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => $this->subject,
-            'message' => $this->message,
-            'url' => $this->url,
+            // 'url' => $this
         ];
     }
 }

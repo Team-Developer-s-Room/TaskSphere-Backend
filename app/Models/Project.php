@@ -28,6 +28,16 @@ class Project extends Model
     ];
 
     /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return array<int, string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['nano_id'];
+    }
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
