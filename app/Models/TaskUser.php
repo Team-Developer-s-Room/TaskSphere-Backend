@@ -33,6 +33,16 @@ class TaskUser extends Model
         return ['nano_id'];
     }
 
+    public function setTaskIdAttribute($value)
+    {
+        $this->attributes['task_id'] = Task::where('nano_id', $value)->value('id') ?? $value;
+    }
+    
+    public function setUserIdAttribute($value)
+    {
+        $this->attributes['user_id'] = User::where('nano_id', $value)->value('id') ?? $value;
+    }
+
     /**
      * Get the route key for the model
      *

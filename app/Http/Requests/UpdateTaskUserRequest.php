@@ -22,8 +22,8 @@ class UpdateTaskUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'task_id' => ['required', 'exists:tasks,id'],
-            'user_id' => ['required', 'exists:users,id'],
+            'task_id' => ['required', 'exists:tasks,nano_id'],
+            'user_id' => ['required', 'exists:users,nano_id'],
         ];
     }
 }

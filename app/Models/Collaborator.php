@@ -32,6 +32,16 @@ class Collaborator extends Model
         return ['nano_id'];
     }
 
+    public function setUserIdAttribute($value)
+    {
+        $this->attributes['user_id'] = User::where('nano_id', $value)->value('id') ?? $value;
+    }
+
+    public function setProjectIdAttribute($value)
+    {
+        $this->attributes['project_id'] = Project::where('nano_id', $value)->value('id') ?? $value;
+    }
+
     /**
      * Get the route key for the model
      *

@@ -36,6 +36,11 @@ class Task extends Model
         return ['nano_id'];
     }
 
+    public function setProjectIdAttribute($value)
+    {
+        $this->attributes['project_id'] = Project::where('nano_id', $value)->value('id') ?? $value;
+    }
+
     /**
      * Get the route key for the model
      *

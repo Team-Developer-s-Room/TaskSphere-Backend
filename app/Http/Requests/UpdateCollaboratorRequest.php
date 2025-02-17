@@ -22,8 +22,8 @@ class UpdateCollaboratorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'exists:users,id'],
-            'project_id' => ['required', 'exists:projects,id'],
+            'user_id' => ['required', 'exists:users,nano_id'],
+            'project_id' => ['required', 'exists:projects,nano_id'],
         ];
     }
 }

@@ -22,7 +22,7 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => ['required', 'exists:projects,id'],
+            'project_id' => ['required', 'exists:projects,nano_id'],
             'description' => ['nullable', 'string', 'max:16777215'],
             'status' => ['nullable', 'string', 'in:pending,completed'],
             'start_time' => ['nullable', 'date', 'before_or_equal:end_time', 'required_with:end_time'],

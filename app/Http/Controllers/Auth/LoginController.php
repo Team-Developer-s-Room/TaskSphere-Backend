@@ -10,7 +10,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 
 use function Illuminate\Support\defer;
-use function Laravel\Prompts\info;
 
 class LoginController extends Controller
 {
@@ -29,8 +28,7 @@ class LoginController extends Controller
 
         $user = Auth::user();
         $token = $user->createToken('API Token')->plainTextToken;
-        // defer(fn () => $user->notify(new TaskSubmitted("Nothing")));
-        // $user->notify(new TaskSubmitted("Nothing")) ? info('Mail successful') : info('Mail failed');
+        // defer(fn () => $user->notify(new TaskSubmitted("New Project", "Nothing")));
 
         return response()->json([
             'data' => new UserResource($user),

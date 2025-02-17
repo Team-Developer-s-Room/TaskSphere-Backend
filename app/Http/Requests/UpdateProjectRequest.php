@@ -22,7 +22,7 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_id' => ['required', 'exists:users,id'],
+            'admin_id' => ['required', 'exists:users,nano_id'],
             'name' => ['required', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'size:2048'],
             'description' => ['nullable', 'max:16777215'],

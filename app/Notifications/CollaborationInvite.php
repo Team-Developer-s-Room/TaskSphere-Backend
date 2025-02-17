@@ -6,25 +6,26 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
 
-class TaskSubmitted extends Notification
+class CollaborationInvite extends Notification
 {
     use Queueable;
 
-    protected $subject = ' Task Submitted';
-    protected $message = ' task and the project admin has been notified.';
+    protected $subject = " Collaborate Invite";
+    protected $message = " has invited you to collaborate on their project. Join the team to start collaborating!";
 
     /**
      * Create a new notification instance.
      */
     public function __construct(
-        protected $project_name,
-        protected $notification_url // Project page url
+        protected $project_name, 
+        protected $receiver_name, 
+        protected $invite_url,
+        protected $notification_url // Accept notification page url
     )
     {
         $this->subject = ucwords($project_name) . $this->subject;
-        $this->message = 'You submitted a ' . ucwords($project_name) . $this->message;
+        $this->message = ucwords($project_name) . $this->message;
     }
 
     /**
@@ -44,10 +45,11 @@ class TaskSubmitted extends Notification
     {
         return (new MailMessage)
             ->subject($this->subject)
-            ->greeting('Hi ' .  Auth::user()->username . ',')
+            ->greeting("Hello {$this->receiver_name},")
             ->line($this->message)
-            ->action('View Task', $this->notification_url)
-            ->salutation("Thank you for using " . env('APP_NAME') . "!");
+            ->action('Accept Invite', $this->invite_url)
+            ->line('Note: The invite link will expire in 7 days.')
+            ->salutation('Thank you for using ' . env('APP_NAME') . '!');
     }
 
     /**

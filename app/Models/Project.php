@@ -27,6 +27,11 @@ class Project extends Model
         'end_date',
     ];
 
+    public function setAdminIdAttribute($value)
+    {
+        $this->attributes['admin_id'] = User::where('nano_id', $value)->value('id') ?? $value;
+    }
+
     /**
      * Get the columns that should receive a unique identifier.
      *
