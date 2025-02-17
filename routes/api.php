@@ -36,16 +36,20 @@ Route::prefix('v1')->group(function () {
         Route::get('project/{project}/tasks', [TaskController::class, 'index'])->name('tasks.index');
         Route::apiResource('tasks', TaskController::class)->except('index');
         
-        Route::prefix('projects/')->name('collaborators.')->group(function() {
+        Route::prefix('projects')->name('collaborators.')->group(function() {
 
             Route::get('{project}/collaborators', [CollaboratorController::class, 'index'])->name('index');
-            Route::post('{project}/collaborators', [CollaboratorController::class, 'store'])->name('store');
+            Route::post('{project}/collaborators/invite', [CollaboratorController::class, 'invite'])->name('invite');
+            Route::post('{project}/collaborators/{user}', [CollaboratorController::class, 'store'])->name('store');
             Route::delete('{project}/collaborators/{user}', [CollaboratorController::class, 'destroy'])->name('destroy');
         });
         
-        Route::get('tasks/{task}/task-users', [TaskUserController::class, 'index']);
-        Route::post('tasks/{task}/task-users', [TaskUserController::class, 'store']);
-        Route::delete('tasks/{task}/task-users/{user}', [TaskUserController::class, 'destroy']);
+        Route::prefix('tasks')->name('task-users.')->group(function() {
+
+            Route::get('{task}/task-users', [TaskUserController::class, 'index'])->name('index');
+            Route::post('{task}/task-users', [TaskUserController::class, 'store'])->name('store');
+            Route::delete('{task}/task-users/{user}', [TaskUserController::class, 'destroy'])->name('destroy');
+        });
     });
 
 });

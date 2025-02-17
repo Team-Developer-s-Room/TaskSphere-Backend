@@ -59,7 +59,7 @@ class CollaboratorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, User $user, Project $project)
+    public function store(Request $request, Project $project, User $user)
     {
         // Check for valid signed route
         if ($request->hasValidSignature()) {
