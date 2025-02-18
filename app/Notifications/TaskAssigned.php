@@ -19,7 +19,6 @@ class TaskAssigned extends Notification
      */
     public function __construct(
         protected $project_name,
-        protected $receiver_name,
         protected $notification_url // Project page url
     )
     {
@@ -44,7 +43,7 @@ class TaskAssigned extends Notification
     {
         return (new MailMessage)
             ->subject($this->subject)
-            ->greeting("Hello {$this->receiver_name},")
+            ->greeting("Hello {$notifiable->username},")
             ->line($this->message)
             ->action('View Task', $this->notification_url)
             ->salutation('Thank you for using ' . env('APP_NAME') . '!');

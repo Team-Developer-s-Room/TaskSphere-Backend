@@ -47,7 +47,6 @@ class TaskUserController extends Controller
 
         defer(fn() => $user->notify(new TaskAssigned(
             $task->project->name,
-            $user->username,
             'Notification_url'
         )));
 

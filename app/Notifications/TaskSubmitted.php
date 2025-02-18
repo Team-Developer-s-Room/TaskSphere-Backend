@@ -44,7 +44,7 @@ class TaskSubmitted extends Notification
     {
         return (new MailMessage)
             ->subject($this->subject)
-            ->greeting('Hi ' .  Auth::user()->username . ',')
+            ->greeting("Hi {$notifiable->username},")
             ->line($this->message)
             ->action('View Task', $this->notification_url)
             ->salutation("Thank you for using " . env('APP_NAME') . "!");

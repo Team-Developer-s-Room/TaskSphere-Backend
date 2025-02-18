@@ -6,14 +6,13 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
 
-class ProjectCreated extends Notification
+class ProjectUpdated extends Notification
 {
     use Queueable;
 
-    protected $subject = ' - New Project Created';
-    protected $message = '. Check it out to complete your setup and start adding new tasks!';
+    protected $subject = ' - Project Updated';
+    protected $message = ' was updated. Check it out to see what\'s new!';
 
     /**
      * Create a new notification instance.
@@ -24,7 +23,7 @@ class ProjectCreated extends Notification
     )
     {
         $this->subject = ucwords($project_name) . $this->subject;
-        $this->message = 'You created a new project - ' . ucwords($project_name) . $this->message;
+        $this->message = 'The project - ' . ucwords($project_name) . $this->message;
     }
 
     /**

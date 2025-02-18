@@ -48,7 +48,6 @@ class CollaboratorController extends Controller
         $user = User::where('nano_id', $validated['user_id'])->firstOrFail();
         defer(fn() => $user->notify(new CollaborationInvite(
             $project->name,
-            $user->username,
             $signed_url,
             'Notification_url'
         )));

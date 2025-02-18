@@ -8,9 +8,11 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\SuperProjectResource;
 use App\Notifications\ProjectCreated;
+use App\Notifications\ProjectUpdated;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
 
 use function Illuminate\Support\defer;
 
@@ -87,6 +89,12 @@ class ProjectController extends Controller
         $validated = $request->validated();
 
         $project->update($validated);
+
+        $users = $project->users->push($project->admin);
+        defer(fn() => Notification::send($users, new ProjectUpdated(
+            $project->name,
+            'Notification_url'
+        )));
 
         return response()->json([
             'data' => new ProjectResource($project),

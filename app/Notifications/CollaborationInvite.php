@@ -19,7 +19,6 @@ class CollaborationInvite extends Notification
      */
     public function __construct(
         protected $project_name, 
-        protected $receiver_name,
         protected $invite_url,
         protected $notification_url // Accept notification page url
     )
@@ -45,7 +44,7 @@ class CollaborationInvite extends Notification
     {
         return (new MailMessage)
             ->subject($this->subject)
-            ->greeting("Hello {$this->receiver_name},")
+            ->greeting("Hello {$notifiable->username},")
             ->line($this->message)
             ->action('Accept Invite', $this->invite_url)
             ->line('Note: The invite link will expire in 7 days.')
