@@ -44,7 +44,10 @@ class ProjectCreated extends Notification
     {
         return (new MailMessage)
             ->greeting('Hello ' . Auth::user()->username . ',')
-            
+            ->subject($this->subject)
+            ->line($this->message)
+            ->action('View Project', $this->notification_url)
+            ->salutation("Thank you for using " . env('APP_NAME') . "!");
     }
 
     /**
@@ -55,7 +58,9 @@ class ProjectCreated extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            
+            'title' => $this->subject,
+            'message' => $this->message,
+            'url' => $this->notification_url,
         ];
     }
 }

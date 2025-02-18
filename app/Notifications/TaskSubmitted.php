@@ -12,7 +12,7 @@ class TaskSubmitted extends Notification
 {
     use Queueable;
 
-    protected $subject = ' Task Submitted';
+    protected $subject = ' - Task Submitted';
     protected $message = ' task and the project admin has been notified.';
 
     /**

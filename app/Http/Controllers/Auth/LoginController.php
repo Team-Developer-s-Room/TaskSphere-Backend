@@ -25,7 +25,6 @@ class LoginController extends Controller
 
         $user = Auth::user();
         $token = $user->createToken('API Token')->plainTextToken;
-        // defer(fn () => $user->notify(new TaskSubmitted("New Project", "Nothing")));
 
         return response()->json([
             'data' => new UserResource($user),

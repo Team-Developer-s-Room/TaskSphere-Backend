@@ -12,6 +12,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
+use function Illuminate\Support\defer;
+
 class ProjectController extends Controller
 {
     /**
@@ -50,7 +52,10 @@ class ProjectController extends Controller
         $project = Project::create($validated);
         $user = Auth::user(); // Project Admin
 
-        $user->notify(new ProjectCreated());
+        defer(fn() => $user->notify(new ProjectCreated(
+            $project->name,
+            'Notification_url'
+        )));
 
         return response()->json([
             'data' => new ProjectResource($project),

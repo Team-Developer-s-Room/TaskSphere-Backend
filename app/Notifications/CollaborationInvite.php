@@ -11,7 +11,7 @@ class CollaborationInvite extends Notification
 {
     use Queueable;
 
-    protected $subject = " Collaboration Invite";
+    protected $subject = " - Collaboration Invite";
     protected $message = " has invited you to collaborate on their project. Join the team to start collaborating!";
 
     /**
