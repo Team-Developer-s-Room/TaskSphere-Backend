@@ -14,6 +14,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 
+use function Illuminate\Support\defer;
+
 class CollaboratorController extends Controller
 {
     /**
@@ -44,12 +46,12 @@ class CollaboratorController extends Controller
         );
 
         $user = User::where('nano_id', $validated['user_id'])->firstOrFail();
-        $user->notify(new CollaborationInvite(
+        defer(fn() => $user->notify(new CollaborationInvite(
             $project->name,
             $user->username,
             $signed_url,
             'Notification_url'
-        ));
+        )));
 
         return response()->json([
             'message' => 'Collaborator invite sent successfully',

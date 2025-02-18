@@ -7,7 +7,9 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\SuperProjectResource;
+use App\Notifications\ProjectCreated;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class ProjectController extends Controller
@@ -46,6 +48,9 @@ class ProjectController extends Controller
         }
 
         $project = Project::create($validated);
+        $user = Auth::user(); // Project Admin
+
+        $user->notify(new ProjectCreated());
 
         return response()->json([
             'data' => new ProjectResource($project),

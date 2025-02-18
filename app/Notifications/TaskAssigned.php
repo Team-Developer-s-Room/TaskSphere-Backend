@@ -7,21 +7,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CollaborationInvite extends Notification
+class TaskAssigned extends Notification
 {
     use Queueable;
 
-    protected $subject = " Collaboration Invite";
-    protected $message = " has invited you to collaborate on their project. Join the team to start collaborating!";
+    protected $subject = ' - New Task Assigned';
+    protected $message = '\'(s) admin assigned you a new task. Check it out to stay updated!';
 
     /**
      * Create a new notification instance.
      */
     public function __construct(
-        protected $project_name, 
+        protected $project_name,
         protected $receiver_name,
-        protected $invite_url,
-        protected $notification_url // Accept notification page url
+        protected $notification_url // Project page url
     )
     {
         $this->subject = ucwords($project_name) . $this->subject;
@@ -47,8 +46,7 @@ class CollaborationInvite extends Notification
             ->subject($this->subject)
             ->greeting("Hello {$this->receiver_name},")
             ->line($this->message)
-            ->action('Accept Invite', $this->invite_url)
-            ->line('Note: The invite link will expire in 7 days.')
+            ->action('View Task', $this->notification_url)
             ->salutation('Thank you for using ' . env('APP_NAME') . '!');
     }
 

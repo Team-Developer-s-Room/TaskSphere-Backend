@@ -9,8 +9,12 @@ use App\Http\Requests\UpdateTaskUserRequest;
 use App\Http\Resources\Auth\UserResource;
 use App\Models\Task;
 use App\Models\User;
+use App\Notifications\TaskAssigned;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
+
+use function Illuminate\Support\defer;
 
 class TaskUserController extends Controller
 {
@@ -40,6 +44,12 @@ class TaskUserController extends Controller
 
         $taskUser = TaskUser::create($validated);
         $user = $taskUser->user;
+
+        defer(fn() => $user->notify(new TaskAssigned(
+            $task->project->name,
+            $user->username,
+            'Notification_url'
+        )));
 
         return response()->json([
             'data' => new UserResource($user),

@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Resources\Auth\UserResource;
-use App\Notifications\TaskSubmitted;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-
-use function Illuminate\Support\defer;
 
 class LoginController extends Controller
 {

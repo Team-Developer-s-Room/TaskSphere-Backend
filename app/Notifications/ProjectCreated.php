@@ -6,26 +6,25 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 
-class CollaborationInvite extends Notification
+class ProjectCreated extends Notification
 {
     use Queueable;
 
-    protected $subject = " Collaboration Invite";
-    protected $message = " has invited you to collaborate on their project. Join the team to start collaborating!";
+    protected $subject = ' - New Project Created';
+    protected $message = '. Check it out to complete your setup and start adding new tasks!';
 
     /**
      * Create a new notification instance.
      */
     public function __construct(
-        protected $project_name, 
-        protected $receiver_name,
-        protected $invite_url,
-        protected $notification_url // Accept notification page url
+        protected $project_name,
+        protected $notification_url // Project page url
     )
     {
         $this->subject = ucwords($project_name) . $this->subject;
-        $this->message = ucwords($project_name) . $this->message;
+        $this->message = 'You created a new project - ' . ucwords($project_name) . $this->message;
     }
 
     /**
@@ -44,12 +43,8 @@ class CollaborationInvite extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject($this->subject)
-            ->greeting("Hello {$this->receiver_name},")
-            ->line($this->message)
-            ->action('Accept Invite', $this->invite_url)
-            ->line('Note: The invite link will expire in 7 days.')
-            ->salutation('Thank you for using ' . env('APP_NAME') . '!');
+            ->greeting('Hello ' . Auth::user()->username . ',')
+            
     }
 
     /**
@@ -60,9 +55,7 @@ class CollaborationInvite extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => $this->subject,
-            'message' => $this->message,
-            'url' => $this->notification_url,
+            
         ];
     }
 }
