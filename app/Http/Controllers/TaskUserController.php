@@ -98,7 +98,7 @@ class TaskUserController extends Controller
         ->delete();
 
         return response()->json([
-            'message' => 'Assignee deleted successfully',
+            'message' => 'Assignee removed successfully',
         ], Response::HTTP_OK);
     }
 }

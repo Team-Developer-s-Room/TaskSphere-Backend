@@ -128,7 +128,7 @@ class CollaboratorController extends Controller
         ->delete();
 
         return response()->json([
-            'message' => 'Collaborator deleted successfully',
+            'message' => 'Collaborator removed successfully',
         ], Response::HTTP_OK);
     }
 
