@@ -24,27 +24,27 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', [LoginController::class, 'login'])->name('login');
         Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum')->name('logout');
         Route::post('/update-password', [UpdatePasswordController::class, 'updatePassword'])
-        ->name('update.password')->middleware('auth:sanctum');
+            ->name('update.password')->middleware('auth:sanctum');
     });
 
     Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('users', UserController::class)->except(['destroy', 'store']);
-        
+
         Route::apiResource('projects', ProjectController::class);
 
         Route::get('project/{project}/tasks', [TaskController::class, 'index'])->name('tasks.index');
         Route::apiResource('tasks', TaskController::class)->except('index');
-        
-        Route::prefix('projects')->name('collaborators.')->group(function() {
+
+        Route::prefix('projects')->name('collaborators.')->group(function () {
 
             Route::get('{project}/collaborators', [CollaboratorController::class, 'index'])->name('index');
             Route::post('{project}/collaborators/invite', [CollaboratorController::class, 'invite'])->name('invite');
             Route::post('{project}/collaborators/{user}', [CollaboratorController::class, 'store'])->name('store');
             Route::delete('{project}/collaborators/{user}', [CollaboratorController::class, 'destroy'])->name('destroy');
         });
-        
-        Route::prefix('tasks')->name('task-users.')->group(function() {
+
+        Route::prefix('tasks')->name('task-users.')->group(function () {
 
             Route::get('{task}/task-users', [TaskUserController::class, 'index'])->name('index');
             Route::post('{task}/task-users', [TaskUserController::class, 'store'])->name('store');
