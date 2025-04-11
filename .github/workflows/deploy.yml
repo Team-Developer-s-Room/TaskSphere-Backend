@@ -1,28 +1,57 @@
+name: Deploy CI/CD
+
 on:
-    push:
-      branches:
-        - main
-  
-name: Deploy Website to cPanel on Push  
+  push:
+    branches: [main]
+
 jobs:
-    web-deploy:
-      name: Deploy Website
-      runs-on: ubuntu-latest
-  
-      steps:
-        # Checkout the repository
-        - name: Checkout Code
-          uses: actions/checkout@v4
-  
-        # Sync files via FTP
-        - name: Sync Files via FTP
-          uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-          with:
-            server: ${{ secrets.FTP_SERVER }}
-            username: ${{ secrets.FTP_USER }}
-            password: ${{ secrets.FTP_PASSWORD }}
-            exclude: .git,README.md
-            force-passive: true
-            protocol: ftps
-            port: 21
-           
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: mbstring, ctype, fileinfo, openssl, pdo, mysql, tokenizer, xml
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          npm install
+          npm run build
+
+      - name: Run tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+        run: php artisan test
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (production)
+        run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+      - name: Upload files via FTP/SFTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # local-dir: ./
+          # server-dir: /public_html/  # Adjust to your hosting path
+          exclude: |
+            .git*
+            .github/
+            .env*
+            tests/
+            node_modules/
+            storage/debugbar/
