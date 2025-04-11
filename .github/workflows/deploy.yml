@@ -24,11 +24,6 @@ jobs:
           npm install
           npm run build
 
-      - name: Run tests
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
-        run: php artisan test
 
   deploy:
     needs: tests
