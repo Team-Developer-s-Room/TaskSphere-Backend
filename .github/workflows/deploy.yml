@@ -22,4 +22,7 @@ jobs:
             username: ${{ secrets.FTP_USER }}
             password: ${{ secrets.FTP_PASSWORD }}
             exclude: .git,README.md
+            force-passive: true
+            protocol: ftps
+            port: 21
            
