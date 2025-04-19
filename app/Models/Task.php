@@ -62,6 +62,13 @@ class Task extends Model
     }
 
     /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = ['project'];
+
+    /**
      * Get the project the task is associated to.
      */
     public function project()

@@ -7,7 +7,9 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
+use App\Notifications\TaskSubmitted;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
@@ -90,6 +92,47 @@ class TaskController extends Controller
 
         return response()->json([
             'message' => 'Task has been deleted successfully',
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Mark task as pending
+     */
+    public function markAsPending(Task $task)
+    {
+        Gate::authorize('update', $task);
+
+        // Ensure the project relationship is loaded
+        $task->load('project');
+
+        $task->status = 'pending';
+        $task->save();
+
+        $user = Auth::user();
+        defer(fn() => $user->notify(new TaskSubmitted(
+            $task->project->name,
+            'Notification_url'
+        )));
+
+        return response()->json([
+            'message' => 'Task marked as pending successfully',
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Mark task as completed
+     */
+    public function markAsCompleted(Task $task)
+    {
+        // Check if the user is authorized to update the task (e.g., admin)
+        Gate::authorize('update', $task);
+
+        // Update the task's status to "completed"
+        $task->status = 'completed';
+        $task->save();
+
+        return response()->json([
+            'message' => 'Task marked as completed successfully',
         ], Response::HTTP_OK);
     }
 }

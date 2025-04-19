@@ -72,4 +72,34 @@ class UserController extends Controller
         // Do something regarding the projects he created
         // Do something regarding the projects he is collaborating in
     }
+
+    public function notifications(User $user)
+    {
+        $notifications = $user->notifications()->latest()->get();
+
+        return response()->json([
+            'data' => $notifications,
+            'message' => 'Notifications retrieved successfully',
+        ], Response::HTTP_OK);
+    }
+
+    public function markAsRead(User $user, string $notificationId)
+    {
+        $notification = $user->notifications()->find($notificationId);
+
+        if (!$notification) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $notification->markAsRead();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification marked as read.',
+        ], Response::HTTP_OK);
+    }
+
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->ulid('nano_id')->unique();
             $table->foreignId('project_id')->constrained();
             $table->mediumText('description')->nullable();
-            $table->string('status')->nullable();
+            $table->string('status')->nullable(); // ['pending', 'completed']
             $table->date('start_time')->nullable();
             $table->date('end_time')->nullable();
             $table->date('start_date')->nullable();

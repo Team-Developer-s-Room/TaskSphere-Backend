@@ -25,15 +25,20 @@ class ProjectController extends Controller
     {
         $userId = auth()->id();
 
-        $projects = Project::with(['admin', 'collaborators'])
+        $projects = Project::with(['admin', 'collaborators', 'tasks'])
             ->where('admin_id', $userId) // Projects where user is an admin
             ->orWhereHas('collaborators', function ($query) use ($userId) {
                 $query->where('user_id', $userId); // Projects where user is a collaborator
             })
             ->get();
 
+        $adminProjects = $projects->where('admin_id', $userId)->values();
+
         return response()->json([
-            'data' => ProjectResource::collection($projects),
+            'data' => [
+                'all_projects' => ProjectResource::collection($projects),
+                'admin_projects' => ProjectResource::collection($adminProjects),
+            ],
             'message' => 'Projects retrieved successfully',
         ], Response::HTTP_OK);
     }
@@ -120,6 +125,35 @@ class ProjectController extends Controller
 
         return response()->json([
             'message' => 'Project deleted successfully',
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Mark a project as completed.
+     */
+    public function markAsCompleted(Project $project)
+    {
+        // Ensure the user is authorized to update the project
+        Gate::authorize('update', $project);
+        
+        // Check if all tasks in the project are completed
+        $allTasksCompleted = $project->tasks->every(function ($task) {
+            return $task->status === 'completed';
+        });
+
+        // If not all tasks are completed, return an error response
+        if (!$allTasksCompleted) {
+            return response()->json([
+                'message' => 'Cannot mark project as completed. Not all tasks are completed.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Mark the project as completed
+        $project->status = 'completed';
+        $project->save();
+
+        return response()->json([
+            'message' => 'Project marked as completed successfully.',
         ], Response::HTTP_OK);
     }
 }
