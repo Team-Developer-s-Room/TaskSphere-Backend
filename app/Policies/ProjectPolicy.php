@@ -28,9 +28,9 @@ class ProjectPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, Project $project): bool
     {
-        return false;
+        return $user->id === $project->admin_id;
     }
 
     /**

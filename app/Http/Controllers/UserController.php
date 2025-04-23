@@ -40,7 +40,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        Gate::authorize('update');
+        Gate::authorize('update', $user);
 
         $validated = $request->validated();
 
@@ -66,7 +66,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        Gate::authorize('delete');
+        Gate::authorize('delete', $user);
         // TODO
         // Soft delete the user
         // Do something regarding the projects he created

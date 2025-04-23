@@ -16,8 +16,8 @@ class TaskUserResource extends JsonResource
     {
         return [
             'id' => $this->nano_id,
-            'task_id' => $this->task_id,
-            'user_id' => $this->user_id,
+            'task_id' => $this->task->nano_id,
+            'user_id' => $this->user->nano_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

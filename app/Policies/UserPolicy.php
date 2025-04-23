@@ -34,17 +34,17 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, User $targetUser): bool
     {
-        return $user->id === auth()->user()->id;
+        return $user->id === $targetUser->id;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, User $targetUser): bool
     {
-        return $user->id === auth()->user()->id;
+        return $user->id === $targetUser->id;
     }
 
     /**

@@ -18,7 +18,7 @@ class CollaboratorResource extends JsonResource
         return [
             'id' => $this->nano_id,
             'user' => new UserResource($this->user),
-            'project_id' => $this->project_id,
+            'project_id' => $this->project->nano_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

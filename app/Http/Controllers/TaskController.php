@@ -12,6 +12,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
+use function Laravel\Prompts\info;
+
 class TaskController extends Controller
 {
     /**
@@ -50,7 +52,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $task->load(['collaborators', 'project']);
+        $task->load(['users', 'project']);
         Gate::authorize('view', $task);
 
         return response()->json([
@@ -64,11 +66,11 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $task->load(['collaborators', 'project']);
+        $task->load(['users', 'project']);
         Gate::authorize('update', $task);
 
         $validated = $request->validated();
-
+        info(count($validated));
         $task->update($validated);
 
         return response()->json([

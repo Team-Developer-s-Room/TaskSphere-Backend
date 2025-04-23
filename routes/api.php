@@ -37,8 +37,9 @@ Route::prefix('v1')->group(function () {
         Route::post('users/{user}/notifications/{notification}/mark-as-read', [UserController::class, 'markAsRead'])->name('users.notifications.markAsRead');
 
         Route::apiResource('projects', ProjectController::class);
+        Route::match(['put', 'patch'], 'projects/{project}/mark-completed', [ProjectController::class, 'markAsCompleted'])->name('markAsCompleted');
 
-        Route::get('project/{project}/tasks', [TaskController::class, 'index'])->name('tasks.index');
+        Route::get('projects/{project}/tasks', [TaskController::class, 'index'])->name('tasks.index');
         Route::apiResource('tasks', TaskController::class)->except('index');
         Route::match(['put', 'patch'], '{task}/mark-completed', [TaskController::class, 'markAsCompleted']);
         Route::match(['put', 'patch'], '{task}/mark-pending', [TaskController::class, 'markAsPending']);
@@ -49,7 +50,6 @@ Route::prefix('v1')->group(function () {
             Route::post('{project}/collaborators/invite', [CollaboratorController::class, 'invite'])->name('invite');
             Route::post('{project}/collaborators/{user}', [CollaboratorController::class, 'store'])->name('store');
             Route::delete('{project}/collaborators/{user}', [CollaboratorController::class, 'destroy'])->name('destroy');
-            Route::match(['put', 'patch'], '{project}/mark-as-completed', [ProjectController::class, 'markAsCompleted'])->name('markAsCompleted');
         });
 
         Route::prefix('tasks')->name('task-users.')->group(function () {
