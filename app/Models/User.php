@@ -112,7 +112,7 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Collaborator::class, Project::class, 'admin_id', 'project_id', 'id', 'id');
     }
-    
+
     /**
      * Get all projects the user is involded in either as an admin or collaborator
      */
@@ -133,4 +133,3 @@ class User extends Authenticatable
     }
 
 }
-    
