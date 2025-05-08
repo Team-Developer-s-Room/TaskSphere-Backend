@@ -24,7 +24,7 @@ class StoreProjectRequest extends FormRequest
         return [
             'admin_id' => ['required', 'exists:users,nano_id'],
             'name' => ['required', 'string', 'max:255'],
-            'image' => ['nullable', 'image', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:5120'],
             'description' => ['nullable', 'max:16777215'],
             'status' => ['in:upcoming,in-progress,completed'],
             'start_date' => ['nullable', 'date', 'before_or_equal:end_date', 'required_with:end_date'],

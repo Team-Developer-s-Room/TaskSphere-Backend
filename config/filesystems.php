@@ -45,6 +45,14 @@ return [
             'throw' => false,
         ],
 
+        'public_folder' => [
+            'driver' => 'local',
+            'root' => public_path('project-images'),
+            'url' => env('APP_URL') . '/project-images',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Http\Requests\UpdateProjectStatusRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\SuperProjectResource;
 use App\Notifications\ProjectCreated;
@@ -51,9 +52,14 @@ class ProjectController extends Controller
         $validated = $request->validated();
 
         // Handle image upload
+        // if ($request->hasFile('image')) {
+        //     $imagePath = $request->file('image')->store('project-images', 'public');
+        //     $validated['image'] = $imagePath;
+        // }
+
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('project-images', 'public');
-            $validated['image'] = $imagePath;
+            $path = $request->file('image')->store('', 'public_folder');
+            $validated['image'] = 'project-images/' . $path;
         }
 
         $project = Project::create($validated);
@@ -129,31 +135,48 @@ class ProjectController extends Controller
     }
 
     /**
-     * Mark a project as completed.
+     * Update project status.
      */
-    public function markAsCompleted(Project $project)
+    public function updateStatus(UpdateProjectStatusRequest $request, Project $project)
     {
-        // Ensure the user is authorized to update the project
         Gate::authorize('update', $project);
-        
-        // Check if all tasks in the project are completed
-        $allTasksCompleted = $project->tasks->every(function ($task) {
-            return $task->status === 'completed';
-        });
 
-        // If not all tasks are completed, return an error response
-        if (!$allTasksCompleted) {
+        $validated = $request->validated();
+        $status = $validated['status'];
+
+        // If status is the same, avoid updating
+        if ($project->status === $status) {
             return response()->json([
-                'message' => 'Cannot mark project as completed. Not all tasks are completed.',
-            ], Response::HTTP_BAD_REQUEST);
+                'message' => "Project is already marked as {$status}.",
+            ], Response::HTTP_OK);
         }
 
-        // Mark the project as completed
-        $project->status = 'completed';
+        // Validate upcoming status logic
+        if ($status === 'upcoming') {
+            if (! $project->start_date || now()->gte($project->start_date)) {
+                return response()->json([
+                    'message' => 'Cannot mark project as upcoming. The start date has already passed or is not set.',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        // Validate completed status logic
+        if ($status === 'completed') {
+            $project->load('tasks');
+            $allTasksCompleted = $project->tasks->every(fn($task) => $task->status === 'completed');
+
+            if (! $allTasksCompleted) {
+                return response()->json([
+                    'message' => 'Cannot mark project as completed. Not all tasks are completed.',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $project->status = $status;
         $project->save();
 
         return response()->json([
-            'message' => 'Project marked as completed successfully.',
+            'message' => "Project marked as {$status} successfully.",
         ], Response::HTTP_OK);
     }
 }

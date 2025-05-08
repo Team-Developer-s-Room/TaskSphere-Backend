@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Requests\UpdateTaskStatusRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Notifications\TaskSubmitted;
@@ -98,43 +99,50 @@ class TaskController extends Controller
     }
 
     /**
-     * Mark task as pending
+     * Update task status.
      */
-    public function markAsPending(Task $task)
+        public function updateStatus(UpdateTaskStatusRequest $request, Task $task)
     {
         Gate::authorize('update', $task);
 
-        // Ensure the project relationship is loaded
+        $validated = $request->validated();
+        $status = $validated['status'];
+
         $task->load('project');
 
-        $task->status = 'pending';
+        // If status is already the same, avoid updating
+        if ($task->status === $status) {
+            return response()->json([
+                'message' => "Task is already marked as {$status}.",
+            ], Response::HTTP_OK);
+        }
+
+        // Only the project admin can mark a task as completed
+        if ($status === 'completed') {
+            $user = Auth::user();
+            $isAdmin = $task->project->admin_id === $user->id;
+
+            if (! $isAdmin) {
+                return response()->json([
+                    'message' => 'Only the project admin can mark a task as completed.',
+                ], Response::HTTP_FORBIDDEN);
+            }
+        }
+
+        $task->status = $status;
         $task->save();
 
-        $user = Auth::user();
-        defer(fn() => $user->notify(new TaskSubmitted(
-            $task->project->name,
-            'Notification_url'
-        )));
+        // Notify only if marked as pending
+        if ($status === 'pending') {
+            $user = Auth::user();
+            defer(fn() => $user->notify(new TaskSubmitted(
+                $task->project->name,
+                'Notification_url'
+            )));
+        }
 
         return response()->json([
-            'message' => 'Task marked as pending successfully',
-        ], Response::HTTP_OK);
-    }
-
-    /**
-     * Mark task as completed
-     */
-    public function markAsCompleted(Task $task)
-    {
-        // Check if the user is authorized to update the task (e.g., admin)
-        Gate::authorize('update', $task);
-
-        // Update the task's status to "completed"
-        $task->status = 'completed';
-        $task->save();
-
-        return response()->json([
-            'message' => 'Task marked as completed successfully',
+            'message' => "Task marked as {$status} successfully.",
         ], Response::HTTP_OK);
     }
 }

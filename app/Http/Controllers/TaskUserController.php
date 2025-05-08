@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RemoveTaskUserRequest;
 use App\Models\TaskUser;
-use App\Http\Requests\StoreTaskUserRequest;
 use App\Http\Requests\UpdateTaskUserRequest;
 use App\Http\Resources\Auth\UserResource;
 use App\Models\Task;
 use App\Models\User;
 use App\Notifications\TaskAssigned;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
@@ -34,19 +34,36 @@ class TaskUserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTaskUserRequest $request, Task $task)
+    public function store(Request $request, Task $task, User $user)
     {
         $task->load('project');
-        Gate::authorize('create', $task);
+        Gate::authorize('assignUser', $task);
 
-        $validated = $request->validated();
-        $validated['task_id'] = $task->id;
+        $project = $task->project;
 
-        $taskUser = TaskUser::create($validated);
-        $user = $taskUser->user;
+        $isAllowed =
+            $project->collaborators()->where('user_id', $user->id)->exists() ||
+            $project->admin_id === $user->id;
+
+        if (! $isAllowed) {
+            return response()->json([
+                'message' => 'The selected user must be a collaborator or the project admin.',
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if ($task->users()->where('users.id', $user->id)->exists()) {
+            return response()->json([
+                'message' => 'User already assigned to this task.',
+            ], Response::HTTP_CONFLICT);
+        }
+
+        $taskUser = TaskUser::create([
+            'task_id' => $task->id,
+            'user_id' => $user->id,
+        ]);
 
         defer(fn() => $user->notify(new TaskAssigned(
-            $task->project->name,
+            $project->name,
             'Notification_url'
         )));
 

@@ -39,16 +39,17 @@ class CollaboratorController extends Controller
         Gate::authorize('create', $project);
 
         $validated = $request->validated();
+        $user = User::where('email', $validated['email'])->firstOrFail();
 
-        $signed_url = URL::temporarySignedRoute(
-            'collaborators.store', now()->addDays(7),
-            ['user' => $validated['user_id'], 'project' => $project->nano_id]
+        $invite_url = URL::temporarySignedRoute(
+            'collaborators.store',
+            now()->addDays(7),
+            ['user' => $user->nano_id, 'project' => $project->nano_id]
         );
 
-        $user = User::where('nano_id', $validated['user_id'])->firstOrFail();
         defer(fn() => $user->notify(new CollaborationInvite(
             $project->name,
-            $signed_url,
+            $invite_url,
             'Notification_url'
         )));
 
@@ -63,24 +64,25 @@ class CollaboratorController extends Controller
     public function store(Request $request, Project $project, User $user)
     {
         // Check for valid signed route
-        if ($request->hasValidSignature()) {
+        if (! $request->hasValidSignature()) {
             return response()->json([
                 'message' => 'Invalid or expired invitation link',
             ], Response::HTTP_FORBIDDEN);
         }
-
-        // Check if the user has already accepted the invitation
+    
+        // Check if user is already a collaborator
         if (Collaborator::where('user_id', $user->id)->where('project_id', $project->id)->exists()) {
             return response()->json([
                 'message' => 'User is already a collaborator on this project.',
             ], Response::HTTP_CONFLICT);
         }
-
+    
+        // Create the collaborator record
         $collaborator = Collaborator::create([
-            'user_id' => $user->nano_id,
-            'project_id' => $project->nano_id,
+            'user_id' => $user->id,
+            'project_id' => $project->id,
         ]);
-
+    
         return response()->json([
             'data' => new UserResource($user),
             'message' => 'Collaborator added successfully',

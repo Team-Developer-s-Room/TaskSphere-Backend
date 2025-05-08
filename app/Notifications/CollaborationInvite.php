@@ -20,7 +20,7 @@ class CollaborationInvite extends Notification
     public function __construct(
         protected $project_name, 
         protected $invite_url,
-        protected $notification_url // Accept notification page url
+        protected $notification_url // Accept notification page url (Link that will lead to a page that shows all invite)
     )
     {
         $this->subject = ucwords($project_name) . $this->subject;

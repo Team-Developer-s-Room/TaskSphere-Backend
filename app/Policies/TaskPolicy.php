@@ -35,6 +35,14 @@ class TaskPolicy
     }
 
     /**
+     * Determine whether the user can assign task.
+     */
+    public function assignUser(User $user, Task $task): bool
+    {
+        return $user->id === $task->project->admin_id;
+    }
+
+    /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Task $task): bool
