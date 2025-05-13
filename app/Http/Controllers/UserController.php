@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CheckEmailRequest;
 use App\Models\User;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\Auth\UserResource;
@@ -99,6 +100,19 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Notification marked as read.',
+        ], Response::HTTP_OK);
+    }
+
+    public function checkUserEmail(CheckEmailRequest $request)
+    {
+        $validated = $request->validated();
+
+        // Search for the user by email
+        $user = User::where('email', $validated['email'])->first();
+
+        return response()->json([
+            'data' => new UserResource($user),
+            'message' => "User exists!",
         ], Response::HTTP_OK);
     }
 

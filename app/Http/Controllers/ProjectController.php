@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Requests\UpdateProjectStatusRequest;
+use App\Http\Resources\ListProjectResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\SuperProjectResource;
 use App\Notifications\ProjectCreated;
@@ -37,8 +38,8 @@ class ProjectController extends Controller
 
         return response()->json([
             'data' => [
-                'all_projects' => ProjectResource::collection($projects),
-                'admin_projects' => ProjectResource::collection($adminProjects),
+                'all_projects' => ListProjectResource::collection($projects),
+                'admin_projects' => ListProjectResource::collection($adminProjects),
             ],
             'message' => 'Projects retrieved successfully',
         ], Response::HTTP_OK);

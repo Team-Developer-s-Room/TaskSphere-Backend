@@ -34,6 +34,29 @@ class CollaboratorController extends Controller
     /**
      * Send coolaboration request to user
      */
+    // public function invite(StoreCollaboratorRequest $request, Project $project)
+    // {
+    //     Gate::authorize('create', $project);
+
+    //     $validated = $request->validated();
+    //     $user = User::where('email', $validated['email'])->firstOrFail();
+
+    //     $invite_url = URL::temporarySignedRoute(
+    //         'collaborators.store',
+    //         now()->addDays(7),
+    //         ['user' => $user->nano_id, 'project' => $project->nano_id]
+    //     );
+
+    //     defer(fn() => $user->notify(new CollaborationInvite(
+    //         $project->name,
+    //         $invite_url
+    //     )));
+
+    //     return response()->json([
+    //         'message' => 'Collaborator invite sent successfully',
+    //     ], Response::HTTP_OK);
+    // }
+
     public function invite(StoreCollaboratorRequest $request, Project $project)
     {
         Gate::authorize('create', $project);
@@ -41,16 +64,26 @@ class CollaboratorController extends Controller
         $validated = $request->validated();
         $user = User::where('email', $validated['email'])->firstOrFail();
 
-        $invite_url = URL::temporarySignedRoute(
+        // Generate the temporary signed backend URL
+        $backendInviteUrl = URL::temporarySignedRoute(
             'collaborators.store',
             now()->addDays(7),
             ['user' => $user->nano_id, 'project' => $project->nano_id]
         );
 
+        // Parse and extract the path + query only
+        $parsedUrl = parse_url($backendInviteUrl);
+        $path = $parsedUrl['path'] ?? '';
+        $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
+        $invitePath = ltrim($path . $query, '/'); // Remove leading slash if needed
+
+        // Construct the final frontend invite link
+        $frontendUrl = "https://www.frontend.com?indicator=true&invite=" . urlencode($invitePath);
+
+        // Defer notification
         defer(fn() => $user->notify(new CollaborationInvite(
             $project->name,
-            $invite_url,
-            'Notification_url'
+            $frontendUrl
         )));
 
         return response()->json([

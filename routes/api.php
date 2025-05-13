@@ -30,11 +30,23 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+        Route::prefix('dashboard')->name('dashboard.')->group(function () {
+            Route::get('assigned-tasks', [DashboardController::class, 'assignedTasks'])->name('assignedTasks');
+            Route::get('today-deadline-tasks', [DashboardController::class, 'todayDeadlineTasks'])->name('todayDeadlineTasks');
+            Route::get('deadline-projects', [DashboardController::class, 'deadlineProjects'])->name('deadlineProjects');
+            Route::get('upcoming-projects', [DashboardController::class, 'upcomingProjects'])->name('upcomingProjects');
+            Route::get('completed-projects', [DashboardController::class, 'completedProjects'])->name('completedProjects');
+            Route::get('weekly-completed-tasks', [DashboardController::class, 'weeklyCompletedTasks'])->name('weeklyCompletedTasks');
+            Route::get('weekly-task-summary', [DashboardController::class, 'weeklyTaskSummary'])->name('weeklyTaskSummary');
+            Route::get('monthly-percentage-task-summary', [DashboardController::class, 'monthlyPercentageTaskSummary'])->name('monthlyPercentageTaskSummary');
+        });
 
         Route::apiResource('users', UserController::class)->except(['destroy', 'store']);
-        Route::get('users/{user}/notifications', [UserController::class, 'notifications'])->name('users.notifications');
-        Route::post('users/{user}/notifications/{notification}/mark-as-read', [UserController::class, 'markAsRead'])->name('users.notifications.markAsRead');
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('{user}/notifications', [UserController::class, 'notifications'])->name('notifications');
+            Route::post('{user}/notifications/{notification}/mark-as-read', [UserController::class, 'markAsRead'])->name('notifications.markAsRead');
+            Route::post('check-email', [UserController::class, 'checkUserEmail'])->name('checkEmail');
+        });
 
         Route::apiResource('projects', ProjectController::class);
         Route::match(['put', 'patch'], 'projects/{project}/update-status', [ProjectController::class, 'updateStatus'])->name('markAsCompleted');
