@@ -22,7 +22,15 @@ class StoreCollaboratorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'exists:users,email'],
+            'emails' => ['required', 'array'],
+            'emails.*' => ['email', 'exists:users,email'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'emails.*.exists' => 'User(s) not found.',
         ];
     }
 }

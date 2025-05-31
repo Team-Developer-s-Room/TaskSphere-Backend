@@ -62,32 +62,46 @@ class CollaboratorController extends Controller
         Gate::authorize('create', $project);
 
         $validated = $request->validated();
-        $user = User::where('email', $validated['email'])->firstOrFail();
+        $emails = $validated['emails'];
 
-        // Generate the temporary signed backend URL
-        $backendInviteUrl = URL::temporarySignedRoute(
-            'collaborators.store',
-            now()->addDays(7),
-            ['user' => $user->nano_id, 'project' => $project->nano_id]
-        );
+        // Determine the frontend base URL based on request scheme
+        $isSecure = $request->isSecure(); // returns true for HTTPS, false for HTTP
+        $frontendBaseUrl = $isSecure
+            ? 'https://task-sphere-five.vercel.app/app?modalIndicator=true&inviteLink='
+            : 'http://localhost:5173/app?modalIndicator=true&inviteLink=';
 
-        // Parse and extract the path + query only
-        $parsedUrl = parse_url($backendInviteUrl);
-        $path = $parsedUrl['path'] ?? '';
-        $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
-        $invitePath = ltrim($path . $query, '/'); // Remove leading slash if needed
+        foreach ($emails as $email) {
+            $user = User::where('email', $email)->first();
 
-        // Construct the final frontend invite link
-        $frontendUrl = "https://www.frontend.com?indicator=true&invite=" . urlencode($invitePath);
+            if (!$user) {
+                continue; // Skip if user somehow isn't found, though validation should catch this
+            }
 
-        // Defer notification
-        defer(fn() => $user->notify(new CollaborationInvite(
-            $project->name,
-            $frontendUrl
-        )));
+            // Generate the temporary signed backend URL
+            $backendInviteUrl = URL::temporarySignedRoute(
+                'collaborators.store',
+                now()->addDays(7),
+                ['user' => $user->nano_id, 'project' => $project->nano_id]
+            );
+
+            // Extract only the path and query
+            $parsedUrl = parse_url($backendInviteUrl);
+            $path = $parsedUrl['path'] ?? '';
+            $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
+            $invitePath = ltrim($path . $query, '/');
+
+            // Construct frontend invite URL
+            $frontendUrl = $frontendBaseUrl . urlencode($invitePath);
+
+            // Defer notification
+            defer(fn() => $user->notify(new CollaborationInvite(
+                $project->name,
+                $frontendUrl
+            )));
+        }
 
         return response()->json([
-            'message' => 'Collaborator invite sent successfully',
+            'message' => 'Collaborator invites sent successfully',
         ], Response::HTTP_OK);
     }
 

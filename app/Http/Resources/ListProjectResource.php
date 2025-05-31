@@ -21,21 +21,24 @@ class ListProjectResource extends JsonResource
             ? round(($completedTasks / $totalTasks) * 100, 2)
             : 0;
 
-        $today = now()->toDateString();
         $start = $this->start_date;
         $end = $this->end_date;
+        $categories = [];
 
-        // Determine project category
-        if ($completionPercentage === 100) {
-            $category = 'completed';
-        } elseif ($this->status === 'upcoming' && $today < $start) {
-            $category = 'upcoming';
-        } elseif ($today === $end && $completionPercentage < 100) {
-            $category = 'deadline';
-        } elseif ($today >= $start && $today <= $end) {
-            $category = 'ongoing';
-        } else {
-            $category = 'unknown'; // fallback
+        if ($this->status === 'completed') {
+            $categories[] = 'completed';
+        }
+        if ($end->between(now(), now()->addDays(5)) && $this->status !== 'completed') {
+            $categories[] = 'deadline';
+        }
+        if ($this->status === 'upcoming' || $start > now()) {
+            $categories[] = 'upcoming';
+        }
+        if ($this->status === 'in-progress') {
+            $categories[] = 'in-progress';
+        }
+        if (empty($categories)) {
+            $categories[] = 'other';
         }
 
         return [
@@ -48,7 +51,7 @@ class ListProjectResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'completion_percentage' => $completionPercentage,
-            'category' => $category,
+            'category' => implode(', ', $categories),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -123,7 +123,8 @@ class DashboardController extends Controller
         $mode = $request->query('mode', 'latest');
         $query = Auth::user()->allProjects()
             ->whereNotNull('end_date')
-            ->whereBetween('end_date', [now(), now()->addDays(7)])
+            ->whereBetween('end_date', [now(), now()->addDays(5)])
+            ->where('status', '!=', 'completed')
             ->latest();
 
         $projects = strtolower($mode) === 'latest'

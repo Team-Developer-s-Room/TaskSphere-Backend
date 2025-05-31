@@ -15,6 +15,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 use function Illuminate\Support\defer;
 
@@ -100,6 +101,17 @@ class ProjectController extends Controller
 
         $validated = $request->validated();
 
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($project->image && Storage::disk('public_folder')->exists(str_replace('project-images/', '', $project->image))) {
+                Storage::disk('public_folder')->delete(str_replace('project-images/', '', $project->image));
+            }
+
+            // Store the new image
+            $path = $request->file('image')->store('', 'public_folder');
+            $validated['image'] = 'project-images/' . $path;
+        }
+
         $project->update($validated);
 
         $users = $project->users->push($project->admin);
@@ -156,7 +168,16 @@ class ProjectController extends Controller
         if ($status === 'upcoming') {
             if (! $project->start_date || now()->gte($project->start_date)) {
                 return response()->json([
-                    'message' => 'Cannot mark project as upcoming. The start date has already passed or is not set.',
+                    'message' => 'Cannot mark project as upcoming. The start date has already passed.',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        // Validate in-progress status logic
+        if ($status === 'in-progress') {
+            if ($project->start_date && now()->lt($project->start_date)) {
+                return response()->json([
+                    'message' => 'Cannot mark project as in-progress. The start date is in the future.',
                 ], Response::HTTP_BAD_REQUEST);
             }
         }
@@ -164,6 +185,13 @@ class ProjectController extends Controller
         // Validate completed status logic
         if ($status === 'completed') {
             $project->load('tasks');
+
+            if ($project->tasks->isEmpty()) {
+                return response()->json([
+                    'message' => 'Cannot mark project as completed. Project has no tasks.',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
             $allTasksCompleted = $project->tasks->every(fn($task) => $task->status === 'completed');
 
             if (! $allTasksCompleted) {

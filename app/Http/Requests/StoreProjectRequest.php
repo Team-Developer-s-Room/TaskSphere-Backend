@@ -26,9 +26,9 @@ class StoreProjectRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'max:5120'],
             'description' => ['nullable', 'max:16777215'],
-            'status' => ['in:upcoming,in-progress,completed'],
-            'start_date' => ['nullable', 'date', 'before_or_equal:end_date', 'required_with:end_date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            // 'status' => ['in:upcoming,in-progress,completed'],
+            'start_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:end_date', 'required_with:end_date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
         ];
     }
 }
