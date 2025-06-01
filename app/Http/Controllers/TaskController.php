@@ -37,7 +37,7 @@ class TaskController extends Controller
     {
         $validated = $request->validated();
         
-        $project = Project::findOrFail($validated['project_id']);
+        $project = Project::where('nano_id', $validated['project_id'])->firstOrFail();
         Gate::authorize('create', $project);
         
         $task = Task::create($validated);
