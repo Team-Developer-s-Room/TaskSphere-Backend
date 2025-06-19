@@ -28,10 +28,10 @@ class ListProjectResource extends JsonResource
         if ($this->status === 'completed') {
             $categories[] = 'completed';
         }
-        if ($end->between(now(), now()->addDays(5)) && $this->status !== 'completed') {
+        if ($end && $end->between(now(), now()->addDays(5)) && $this->status !== 'completed') {
             $categories[] = 'deadline';
         }
-        if ($this->status === 'upcoming' || $start > now()) {
+        if ($this->status === 'upcoming' || ($start && $start > now())) {
             $categories[] = 'upcoming';
         }
         if ($this->status === 'in-progress') {
