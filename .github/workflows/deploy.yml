@@ -2,7 +2,7 @@ name: FTP Deploy to CPanel
 
 on:
   push:
-    branches: [ main ]
+    branches: [ staging ]
 
 jobs:
   deploy:
