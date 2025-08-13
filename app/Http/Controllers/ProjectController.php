@@ -133,6 +133,14 @@ class ProjectController extends Controller
     {
         Gate::authorize('delete', $project);
 
+        // Delete project image if it exists
+        if ($project->image) {
+            $relativePath = str_replace('project-images/', '', $project->image);
+            if (Storage::disk('public_folder')->exists($relativePath)) {
+                Storage::disk('public_folder')->delete($relativePath);
+            }
+        }
+
         // Delete associated tasks
         $project->tasks()->delete();
         // Delete associated collaborators

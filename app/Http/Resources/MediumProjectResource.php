@@ -19,7 +19,7 @@ class MediumProjectResource extends JsonResource
             'id' => $this->nano_id,
             'admin' => new UserResource($this->admin),
             'name' => $this->name,
-            'image' => $this->image,
+            'image' => $this->image ? asset($this->image) : null,
             'description' => $this->description,
             'status' => $this->status,
             'start_date' => $this->start_date,

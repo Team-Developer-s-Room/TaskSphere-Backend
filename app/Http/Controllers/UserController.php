@@ -68,10 +68,18 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         Gate::authorize('delete', $user);
-        // TODO
-        // Soft delete the user
-        // Do something regarding the projects he created
-        // Do something regarding the projects he is collaborating in
+
+        // Delete profile image if present
+        if ($user->image && Storage::disk('public')->exists($user->image)) {
+            Storage::disk('public')->delete($user->image);
+        }
+
+        // TODO: Soft delete user and handle associated data as needed
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User deleted successfully',
+        ], Response::HTTP_OK);
     }
 
     public function notifications(User $user)
