@@ -19,3 +19,4 @@ jobs:
           local-dir: ./  # Deploys all files
           server-dir: /
 
+
